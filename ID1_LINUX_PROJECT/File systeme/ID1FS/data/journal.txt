@@ -1,0 +1,161 @@
+home/ahmed/file2 is moved at 09-12-2023 18:47:32 by yocef
+home/ahmed/file3 is moved to RecycleBin at 09-12-2023 18:55:50 by yocef
+home/ahmed/file4 is moved to RecycleBin at 09-12-2023 19:03:55 by yocef
+home/ahmed/file9 is moved to RecycleBin at 09-12-2023 19:11:51 by yocef
+home/ahmed/file.txt is moved to RecycleBin at 09-12-2023 19:14:14 by yocef
+home/ahmed/file.txt is moved to RecycleBin at 09-12-2023 19:19:31 by yocef
+home/ahmed/file7 is moved to RecycleBin at 09-12-2023 19:25:58 by yocef
+home/ahmed/file6 is moved to RecycleBin at 09-12-2023 19:27:14 by yocef
+home/ahmed/file8 is moved to RecycleBin at 09-12-2023 19:27:49 by yocef
+file10 is created at 2023-12-09 19:47:12 by ahmed with size 0 bytes
+file.txt is moved into Recycle Bin at 2023-12-09 19:59:05 by None
+../home/ahmed/file5 is moved to RecycleBin at 09-12-2023 19:59:05 by yocef
+file5 is moved into Recycle Bin at 2023-12-09 19:59:05 by None
+file.txt is moved into Recycle Bin at 2023-12-09 19:59:44 by None
+../home/ahmed/file10 is moved to RecycleBin at 09-12-2023 19:59:44 by yocef
+file10 is moved into Recycle Bin at 2023-12-09 19:59:44 by None
+file.txt is moved into RecycleBin at 2023-12-09 20:03:08 by None
+../home/ahmed/file3 is moved to RecycleBin at 09-12-2023 20:03:08 by yocef
+file3 is moved into RecycleBin at 2023-12-09 20:03:08 by None
+mydistro/home/ahmed/file0 is moved to RecycleBin at 09-12-2023 20:44:49 by yocef
+home/ahmed/file2 is moved to RecycleBin at 09-12-2023 20:46:14 by yocef
+home/ahmed/file4 is moved to RecycleBin at 09-12-2023 20:50:01 by yocef
+file4 is moved into RecycleBin at 2023-12-09 20:50:01 by None
+home/ahmed/file1 is moved to RecycleBin at 09-12-2023 20:55:43 by yocef
+home/ahmed/file0 is moved to RecycleBin at 09-12-2023 21:00:37 by yocef
+file0 is moved into RecycleBin at 2023-12-09 21:00:37 by None
+home/ahmed/file1 is moved to RecycleBin at 09-12-2023 21:09:30 by yocef
+file1 is moved into RecycleBin at 2023-12-09 21:09:30 by None
+home/ahmed/file2 is removed permanently to RecycleBin at 09-12-2023 21:09:46 by yocef
+file2 is removed at 2023-12-09 21:09:46 by None
+home/ahmed/dir1 is moved to RecycleBin at 09-12-2023 21:11:14 by yocef
+dir1 is moved into RecycleBin at 2023-12-09 21:11:14 by None
+home/ahmed/dir0 is moved to RecycleBin at 09-12-2023 21:13:23 by yocef
+dir0 is moved into RecycleBin at 2023-12-09 21:13:23 by None
+home/ahmed/dir1 is removed permanently to RecycleBin at 09-12-2023 21:16:53 by yocef
+dir1 is removed at 2023-12-09 21:16:53 by None
+home/ahmed/dir0 is removed permanently to RecycleBin at 09-12-2023 21:21:10 by yocef
+dir0 is removed at 2023-12-09 21:21:10 by None
+file20 is created at 2023-12-09 21:25:55 with size 0 bytes by ahmed 
+../home/ahmed/file20 is moved to RecycleBin at 09-12-2023 21:27:42 by yocef
+file20 is moved into RecycleBin at 2023-12-09 21:27:42 by None
+file21 is created at 2023-12-09 21:32:22 with size 0 bytes by ahmed 
+home/ahmed/file5 is moved to RecycleBin at 10-12-2023 12:13:20 by yocef
+file5 is moved into RecycleBin at 2023-12-10 12:13:20 by None
+home/ahmed/file7 is removed permanently to RecycleBin at 10-12-2023 12:25:01 by yocef
+home/ahmed/file8 is moved to RecycleBin at 10-12-2023 12:33:24 by yocef
+../home/ahmed/file2 is removed permantly at 2023-12-11 12:20:19 by yocef
+filex is created at 2023-12-13 21:39:30 with size 0 bytes by ahmed 
+file10 is moved into recyclebin at 2023-12-14 16:47:23 by yocef
+archive.zip is moved into recyclebin at 2023-12-14 16:48:01 by yocef
+file21 is moved into recyclebin at 2023-12-14 16:48:32 by yocef
+archive.zip is restored from recylebin at 2023-12-14 16:50:07 by yocef
+dir0 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+dir1 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file0 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file1 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file10 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file20 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file21 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+file5 is restored from recylebin at 2023-12-14 16:50:07 by yocef
+whereami.py is created at 2023-12-14 17:03:23 with size 0 bytes by ahmed 
+fer3awn is created at 2023-12-14 19:15:27
+The user joseph is created at 2023-12-14 19:24:06
+The user fer3awn is connected at 2023-12-14 21:20:08
+The user root is created at 2023-12-14 21:41:30
+The user root is connected at 2023-12-14 21:41:44
+The user fer3awn is deleted
+file1 is created at 2023-12-14 21:55:05 with size 0 bytes
+dir1 is created at 2023-12-14 22:00:23
+The file ../home/root/f1 is renamed by ../home/root/fille1 at 2023-12-15 09:44:15.028209.
+.. is moved into recyclebin at 2023-12-15 10:03:02 by yocef
+The file file1 was renamed to hhh by root at 2023-12-15 10:14:14.813813.
+dir2 is created at 2023-12-15 10:19:40
+The user hafid is created at 2023-12-16 12:50:27
+The user hafid is connected at 2023-12-16 12:51:04
+haho is created at 2023-12-16 12:52:21 with size 0 bytes
+The user root is created at 2023-12-19 19:47:42
+The user root is connected at 2023-12-19 19:48:10
+lala is created at 2023-12-19 19:52:07 with size 0 bytes
+jojo is created at 2023-12-19 19:58:46
+The user hafid is created at 2023-12-19 20:00:36
+The user hafid is connected at 2023-12-19 20:00:47
+The user root is connected at 2023-12-19 20:03:20
+The user hafid is connected at 2023-12-19 20:08:16
+kaka is created at 2023-12-19 20:08:44 with size 0 bytes
+The user moha is created at 2023-12-19 20:09:19
+The user moha is connected at 2023-12-19 20:10:07
+The user root is connected at 2023-12-19 20:10:23
+The user root is connected at 2023-12-19 20:11:54
+The user hafid is connected at 2023-12-19 20:12:13
+The user root is connected at 2023-12-19 20:12:32
+The user moha is deleted
+The file lala was renamed to bibi by root at 2023-12-19 20:57:25.356425.
+lala is created at 2023-12-19 21:12:34 with size 0 bytes
+lala is created at 2023-12-19 21:13:04 with size 0 bytes
+The file lala was renamed to bibi by root at 2023-12-19 21:13:17.470246.
+lala is created at 2023-12-19 21:13:59 with size 0 bytes
+The file lala was renamed to bibi by root at 2023-12-20 10:06:26.446241.
+lala is created at 2023-12-20 10:25:44 with size 0 bytes
+The file lala was renamed to bibi by root at 2023-12-20 10:25:50.613143.
+lala is created at 2023-12-20 10:31:08 with size 0 bytes
+The file lala was renamed to bibi by root at 2023-12-20 10:31:14.385834.
+koko is created at 2023-12-20 10:35:32 with size 0 bytes
+The file koko was renamed to baba by root at 2023-12-20 10:35:38.450605.
+jaja is created at 2023-12-22 15:12:20 with size 0 bytes
+nana is created at 2023-12-22 15:12:37
+jaja is moved into recyclebin at 2023-12-22 16:02:25 by root
+The user root is connected at 2023-12-22 16:27:33
+The user root is connected at 2023-12-22 16:27:58
+The user root is connected at 2023-12-22 16:29:05
+The user root is connected at 2023-12-22 16:30:43
+The user root is connected at 2023-12-22 16:31:50
+The user root connect at 2023-12-22 16:40:34
+The user root connect at 2023-12-22 16:42:19
+The user root connect at 2023-12-22 16:44:40
+lala is created at 2023-12-22 17:59:31 with size 0 bytes
+lala is deleted at 2023-12-22 18:00:45, created on 2023-12-22 17:59:31
+The user hafid connect at 2023-12-22 18:01:58
+nana is created at 2023-12-22 18:02:07 with size 0 bytes
+The user moha is created at 2023-12-22 18:02:26
+The user moha connect at 2023-12-22 18:03:12
+The user moha failure to connect at 2023-12-22 18:03:27
+kiki is created at 2023-12-22 18:04:02 with size 0 bytes
+kiki is deleted at 2023-12-22 18:04:07, created on 2023-12-22 18:04:02
+The user root connect at 2023-12-22 18:04:25
+nana is deleted at 2023-12-22 18:04:29, created on 2023-12-22 18:02:07
+The user hafid connect at 2023-12-22 18:15:21
+The user root connect at 2023-12-22 18:16:18
+The user khadija is created at 2023-12-22 18:16:26
+mimi is created at 2023-12-22 21:58:13 with size 0 bytes
+mimi file is deleted at 2023-12-22 21:59:32, created on 2023-12-22 21:58:13
+mimi is created at 2023-12-22 22:00:18 with size 0 bytes
+momo is created at 2023-12-22 22:00:47
+The user hafid connect at 2023-12-22 22:01:02
+The user root connect at 2023-12-22 22:01:19
+momo directory is deleted at 2023-12-22 22:01:36, created on 2023-12-22 22:00:47
+nik is created at 2023-12-22 22:02:06
+mimi file is deleted at 2023-12-22 22:02:26, created on 2023-12-22 22:00:18
+nik directory is deleted at 2023-12-22 22:02:39, created on 2023-12-22 22:02:06
+nika is created at 2023-12-23 12:34:57 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:35:16 by root
+nika is created at 2023-12-23 12:41:03 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:41:07 by root
+nika is created at 2023-12-23 12:45:30 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:45:50 by root
+nika is created at 2023-12-23 12:46:29 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:46:39 by root
+nika is restored from recylebin at 2023-12-23 12:47:22 by root
+nika is created at 2023-12-23 12:48:04 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:48:53 by root
+nika is created at 2023-12-23 12:52:57 with size 0 bytes
+nika is moved into recyclebin at 2023-12-23 12:54:32 by root
+ha is created at 2023-12-23 13:06:34 with size 0 bytes
+ha is moved into recyclebin at 2023-12-23 13:06:55 by root
+nika is created at 2023-12-23 13:13:13 with size 0 bytes
+ha is created at 2023-12-23 13:13:35 with size 0 bytes
+nika is created at 2023-12-23 13:20:15 with size 0 bytes
+ni is created at 2023-12-23 13:20:19 with size 0 bytes
+sabar is created at 2023-12-23 13:23:44 with size 0 bytes
+jaja is created at 2023-12-23 13:32:48 with size 0 bytes
+jaja is moved into recyclebin at 2023-12-23 13:33:18 by root

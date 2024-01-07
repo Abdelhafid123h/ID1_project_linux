@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+import argparse
+import json
+import os
+import getpass
+import shutil
+
+def delete_user(username, metadata_file_path, owner_file_path, mydistro_directory):
+    # Determine the directory of the script
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+    # Check if the owner of the file is 'root'
+    try:
+        with open(owner_file_path, 'r') as owner_file:
+            owner = owner_file.read().strip()
+            if owner != 'root':
+                print("Error: You need root permissions to delete a user.")
+                return
+    except FileNotFoundError:
+        print(f"Error: Owner file not found at {os.path.join(script_directory, owner_file_path)}")
+        return
+
+    # Proceed with user deletion
+    try:
+        with open(metadata_file_path, 'r') as metadata_file:
+            metadata_data = json.load(metadata_file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print(f"Error: metadata file not found or invalid at {os.path.join(script_directory, metadata_file_path)}")
+        return
+
+    # Find the user in the metadata and remove it
+    updated_metadata = [user for user in metadata_data if 'username' in user and user['username'] != username]
+
+    # Check if the user was found and removed
+    if len(updated_metadata) == len(metadata_data):
+        print(f"Error: User '{username}' not found.")
+    else:
+        with open(metadata_file_path, 'w') as metadata_file:
+            json.dump(updated_metadata, metadata_file, indent=2)
+        print(f"User '{username}' deleted successfully.")
+
+        # Remove the user's home directory using relative path
+        home_directory = os.path.join(mydistro_directory, 'home', username)
+        try:
+            shutil.rmtree(home_directory)
+            print(f"Home directory '{home_directory}' deleted successfully.")
+        except FileNotFoundError:
+            print(f"Error: Home directory '{home_directory}' not found.")
+        except Exception as e:
+            print(f"Error: An unexpected error occurred while deleting the home directory: {e}")
+
+        text_to_append = f'The user {username} is deleted\n'
+        with open(os.path.join(mydistro_directory, 'data', 'journal.txt'), 'a') as file4:
+            file4.write(text_to_append)
+
+def main():
+    parser = argparse.ArgumentParser(description="Delete User Script")
+
+    # Define command-line arguments
+    parser.add_argument("username", type=str, help="Username of the user to delete")
+
+    args = parser.parse_args()
+
+    # Determine the directory of the script
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+
+    # Specify the paths using the script_directory
+    metadata_file_path = os.path.join(mydistro_directory, 'data', 'userdata.json')
+    owner_file_path = os.path.join(mydistro_directory, 'data', 'check_user_file.txt')
+
+    delete_user(args.username, metadata_file_path, owner_file_path, mydistro_directory)
+
+if __name__ == "__main__":
+    main()

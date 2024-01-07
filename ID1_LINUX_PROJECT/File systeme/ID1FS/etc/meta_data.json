@@ -1,0 +1,75 @@
+[
+  {
+    "filename": "file1",
+    "file_path": "../home/ahmed/file1",
+    "size": 0,
+    "creation_date": "2023-12-07 14:01:46",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "file"
+  },
+  {
+    "filename": "file2",
+    "file_path": "../home/ahmed/file2",
+    "size": 0,
+    "creation_date": "2023-12-07 14:10:42",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "file"
+  },
+  {
+    "filename": "file1",
+    "file_path": "../home/ahmed/file1",
+    "size": 0,
+    "creation_date": "2023-12-11 12:18:53",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "file"
+  },
+  {
+    "filename": "file2",
+    "file_path": "../home/ahmed/file2",
+    "size": 0,
+    "creation_date": "2023-12-11 12:19:31",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "file"
+  },
+  {
+    "directory_name": "dir70",
+    "directory_path": "../home/ahmed/dir70",
+    "creation_date": "2023-12-14 17:19:30",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "directory"
+  },
+  {
+    "directory_name": "dir71",
+    "directory_path": "/home/yocef/mydistro/bin/../home/ahmed/dir71",
+    "creation_date": "2023-12-14 17:20:24",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "directory"
+  },
+  {
+    "filename": "filo0",
+    "file_path": "/home/yocef/mydistro/bin/../home/ahmed/filo0",
+    "size": 41,
+    "creation_date": "2023-12-14 17:39:33",
+    "owner": "ahmed",
+    "droits": "-rw-rw-r--",
+    "type": "file"
+  },
+  {
+    "Name": "filo1",
+    "Type": "file",
+    "Owner": "ahmed",
+    "Size": 0,
+    "Location": "/home/yocef/mydistro/bin/../home/ahmed/filo1",
+    "size": 0,
+    "Date Created": "2023-12-14 17:45:56",
+    "Date Modified": "2023-12-14 17:45:56",
+    "Permissions": "-rw-rw-r--",
+    "Status": "Available"
+  }
+]

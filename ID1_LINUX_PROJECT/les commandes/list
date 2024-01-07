@@ -1,0 +1,47 @@
+#!/usr/bin/python3
+import os
+import sys
+
+def lister_fichiers(repertoire='.'):
+    bin_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(bin_directory)
+
+    try:
+        with open(os.path.join(mydistro_directory,'data', 'check_user_file.txt'), 'r') as owner_file:
+            owner = owner_file.read().strip()
+    except FileNotFoundError:
+        print('Error: owner file not found')
+        sys.exit(1)
+
+    home_directory = os.path.join(mydistro_directory, 'home', owner)
+
+    if os.path.exists(os.path.join(home_directory, repertoire)):
+        try:
+            fichiers = os.listdir(os.path.join(home_directory, repertoire))
+            for fichier in fichiers:
+                print(fichier)
+        except FileNotFoundError:
+            print(f"Directory '{repertoire}' does not exist.")
+        except PermissionError:
+            print(f"You do not have permission to access the directory '{repertoire}'.")
+    elif owner == 'root':
+        try:
+            fichiers = os.listdir(os.path.join(mydistro_directory, repertoire))  # Ajout du répertoire
+            for fichier in fichiers:
+                print(fichier)
+        except FileNotFoundError:
+            print(f"Directory '{repertoire}' does not exist.")
+        except PermissionError:
+            print(f"You do not have permission to access the directory '{repertoire}'.")
+    else:
+        print(f"You do not have permissions to access the directory '{repertoire}'.")
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        repertoire = sys.argv[1]
+        lister_fichiers(repertoire)
+    elif len(sys.argv) > 2:
+        print("Usage : list [directory_name]")
+    else:
+        lister_fichiers()
+

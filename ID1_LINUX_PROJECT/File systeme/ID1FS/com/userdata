@@ -1,0 +1,17 @@
+#!/usr/bin/python3
+import subprocess
+import os
+def open_json_with_nano(file_path):
+    try:
+        # Use subprocess to run the 'nano' command with the specified file path
+        subprocess.run(['nano', file_path], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    # Specify the path to your JSON file
+    json_file_path =os.path.join(os.path.dirname(__file__), '..', 'data',  'userdata.json')
+
+    # Call the function to open the JSON file with nano
+    open_json_with_nano(json_file_path)
+

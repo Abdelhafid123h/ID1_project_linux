@@ -1,0 +1,76 @@
+#!/usr/bin/python3
+import json
+import hashlib
+from datetime import datetime
+import os
+import subprocess
+import sys
+from getpass import getpass
+
+script_directory = os.path.dirname(os.path.abspath(__file__))
+mydistro_directory = os.path.dirname(script_directory)
+def cd_path(users):
+    path = os.path.join(mydistro_directory, 'home', users)
+    try:
+        subprocess.run(f'cd {path}', shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Unable to change directory to {path}")
+        sys.exit(1)
+
+
+def connect_user(username, password):
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    user_data_path = os.path.join(mydistro_directory, 'data', 'userdata.json')
+    try:
+        with open(user_data_path, 'r') as file:
+            user_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("Error: User data not found.")
+        return False
+
+    user = next((user for user in user_data if user['username'] == username), None)
+
+    if user:
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        if hashed_password == user['hashed_password']:
+            print(f"Connected successfully as '{username}'.")
+            create_user_file(username)
+            log_user_activity(username, current_time, success=True)
+            return True
+        else:
+            print("Incorrect password.")
+            log_user_activity(username, current_time, success=False)
+    else:
+        print(f"User '{username}' not found.")
+
+    return False
+
+def create_user_file(username):
+    file_path = os.path.join(mydistro_directory, 'data', 'check_user_file.txt')
+    with open(file_path, 'w') as file:
+        file.write(username)
+
+def log_user_activity(username, timestamp, success=True):
+    action = "connect" if success else "failure to connect"
+    text_to_append = f'The user {username} {action} at {timestamp}\n'
+    journal_file_path = os.path.join(mydistro_directory, 'data', 'journal.txt')
+    with open(journal_file_path, 'a') as file4:
+        file4.write(text_to_append)
+
+def main():
+    username = input("Enter username: ")
+    password = getpass("Enter password: ")
+
+    connected = connect_user(username, password)
+
+    if connected:
+        create_user_file(username)
+        cd_path(username)
+    else:
+        # Add actions to perform when the connection fails
+        pass
+
+if __name__ == "__main__":
+    main()
+

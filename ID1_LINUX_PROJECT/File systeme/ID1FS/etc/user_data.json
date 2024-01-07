@@ -1,0 +1,12 @@
+[
+  {
+    "username": "ahmed",
+    "hashed_password": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "created_at": "2023-12-07 12:55:05"
+  },
+  {
+    "username": "porsch",
+    "hashed_password": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "created_at": "2023-12-14 13:23:44"
+  }
+]

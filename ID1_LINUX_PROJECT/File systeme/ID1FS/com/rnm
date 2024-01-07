@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+#import os
+#import sys
+#from datetime import datetime
+#def renomer_fichier(ancien_nom,nouveau_nom):
+# try:
+ # os.rename(ancien_nom,nouveau_nom)
+ # print(f"{ancien_nom} was renamed to {nouveau_nom} successfully.")
+#  with open("../data/journal.txt","a") as fichier:
+#   fichier.write(f"The file {ancien_nom} is renamed by {nouveau_nom} at {datetime.now()}.\n")
+# except FileNotFoundError:
+#  print(f"An error has occurred :{e}")
+#if __name__=="__main__":
+# if len(sys.argv)!=3:
+#   print("Usage : The syntax is not complete !")
+#   sys.exit(1)
+# ancien_nom=sys.argv[1]
+# nouveau_nom=sys.argv[2]
+# renomer_fichier(ancien_nom,nouveau_nom)
+
+
+
+
+
+
+
+import os
+import sys
+import json
+from datetime import datetime
+
+def get_current_user():
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        user_file_path = os.path.join(script_dir, "../data/check_user_file.txt")
+        with open(user_file_path, "r") as user_file:
+            current_user = user_file.read().strip()
+            return current_user
+    except FileNotFoundError as e:
+        print(f"Error reading user file: {e}")
+        return None
+
+
+def renomer_fichier(ancien_nom, nouveau_nom):
+    try:
+        current_user = get_current_user()
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(script_dir, "../home/", current_user, ancien_nom)
+        metadata_path = os.path.join(script_dir, "../data/metadata.json")
+        journal_path = os.path.join(script_dir, "../data/journal.txt")
+
+        if not os.path.exists(metadata_path):
+            print(f"The file {metadata_path} does not exist.")
+            return
+
+        with open(metadata_path, "r") as metadata_file:
+            metadata = json.load(metadata_file)
+
+        file_info = next((f for f in metadata if f["Name"] == os.path.basename(ancien_nom)), None)
+
+        if file_info:
+            file_owner = file_info["Owner"]
+
+            if current_user and current_user != file_owner:
+                with open(journal_path, "a") as fichier:
+                    fichier.write(f"The user {current_user} was trying to rename the file {os.path.basename(ancien_nom)} at {datetime.now()}.\n")
+                print(f"You are not the owner of the file {ancien_nom}.")
+                return
+
+            # Update the file name in metadata
+            file_info["Name"] = os.path.basename(nouveau_nom)
+
+            new_file_path = os.path.join(script_dir, "../home/", current_user, nouveau_nom)
+            os.rename(file_path, new_file_path)
+            print(f"{ancien_nom} was renamed to {nouveau_nom} successfully.")
+
+            # Save the updated metadata
+            with open(metadata_path, "w") as metadata_file:
+                json.dump(metadata, metadata_file, indent=2)
+
+            with open(journal_path, "a") as fichier:
+                fichier.write(f"The file {ancien_nom} was renamed to {nouveau_nom} by {current_user} at {datetime.now()}.\n")
+        else:
+            print(f"File information not found for {ancien_nom} in metadata.json.")
+    except FileNotFoundError as e:
+        print(f"An error has occurred: {e}")
+    except Exception as e:
+        print(f"An unexpected error has occurred: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: The syntax is not complete!")
+        sys.exit(1)
+
+    ancien_nom = sys.argv[1]
+    nouveau_nom = sys.argv[2]
+    renomer_fichier(ancien_nom, nouveau_nom)
+

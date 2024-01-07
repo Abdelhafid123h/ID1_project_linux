@@ -1,0 +1,93 @@
+#!/usr/bin/python3
+import argparse
+import json
+import os
+from datetime import datetime
+import sys
+from getpass import getpass
+import hashlib
+def get_current_user():
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        user_file_path = os.path.join(script_dir, "../data/check_user_file.txt")
+        with open(user_file_path, "r") as user_file:
+            current_user = user_file.read().strip()
+            return current_user
+    except FileNotFoundError as e:
+        print(f"Error reading user file: {e}")
+        return None
+def create_user(username, password):
+    # Check for help flag
+    if username == "-h" or username == "--help":
+        print("Utilization: cruser <username>")
+        sys.exit(0)
+
+    # Get password interactively without echoing to the console
+    if not password:
+        password = getpass("Enter password: ")
+
+    # Hash the password using SHA-256
+    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+    # Determine the directory of the script
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+    # You can perform user creation actions here
+    # For simplicity, let's just store user metadata in a dictionary
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    user_metadata = {
+        'username'       : username,
+        'hashed_password': hashed_password,
+        'created_at'     : current_time,
+        # Add more metadata as needed
+    }
+
+    # Construct the path to user_data.json using the script_directory
+    user_data_path = os.path.join(mydistro_directory, 'data', 'userdata.json')
+
+    # Load existing user data or initialize an empty list
+    try:
+        with open(user_data_path, 'r') as file:
+            user_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        user_data = []
+
+    # Add the new user metadata
+    user_data.append(user_metadata)
+
+    # Save the updated user data to the JSON file
+    with open(user_data_path, 'w') as file:
+        json.dump(user_data, file, indent=2)
+
+    # Construct the path to the home folder using the script_directory
+    home_folder_path = os.path.join(mydistro_directory, 'home', username)
+    os.makedirs(home_folder_path, exist_ok=True)
+
+    print(f"User '{username}' created successfully.")
+    print(f"Home folder created at: {home_folder_path}")
+    text_to_append = f'The user {username} is created at {current_time}\n'
+    # Construct the path to journal.txt using the script_directory
+    journal_file_path = os.path.join(mydistro_directory, 'data', 'journal.txt')
+    with open(journal_file_path, 'a') as file4:
+        file4.write(text_to_append)
+
+def main():
+    # Create an argument parser
+    owner =get_current_user()
+    if owner != 'root':
+       print('permession error connect as root')
+       sys.exit()
+    parser = argparse.ArgumentParser(description="Create a user and add metadata to a JSON file")
+
+    # Define command-line arguments
+    parser.add_argument("username", type=str, help="Username of the new user")
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Call the create_user function with the provided username and let it prompt for the password
+    create_user(args.username, None)
+
+if __name__ == "__main__":
+    main()

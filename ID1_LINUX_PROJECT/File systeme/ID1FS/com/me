@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+import os
+
+# Obtenez le chemin du script Python en cours d'exécution
+script_chemin = os.path.abspath(__file__)
+
+# Construisez le chemin relatif vers le fichier texte en remontant d'un niveau
+fichier_chemin_relatif = os.path.join(os.path.dirname(os.path.dirname(script_chemin)), 'data',  'check_user_file.txt')
+
+try:
+    # Ouvrez le fichier en mode lecture
+    with open(fichier_chemin_relatif, 'r') as fichier:
+        # Lisez tout le contenu du fichier
+        contenu = fichier.read()
+
+        # Affichez le contenu
+        print(contenu)
+
+except FileNotFoundError:
+    print(f"The file {fichier_chemin_relatif} was not found.")
+except Exception as e:
+    print(f"an error has occurred : {str(e)}")

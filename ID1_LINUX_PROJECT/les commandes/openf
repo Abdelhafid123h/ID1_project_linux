@@ -1,0 +1,87 @@
+#!/usr/bin/python3
+import os
+import sys
+import json
+import subprocess
+
+def is_regular_file(file_path, owner):
+    try:
+        return os.path.isfile(file_path)
+    except Exception as e:
+        print(f"An error occurred while checking if '{file_path}' is a regular file: {e}")
+        return False
+
+def check_file_entry(filename_to_check, owner_to_check):
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+    json_file_path = os.path.join(mydistro_directory, 'data', 'metadata.json')
+
+    with open(json_file_path, 'r') as json_file:
+        data = json.load(json_file)
+
+        for entry in data:
+            full_path = os.path.normpath(os.path.join(mydistro_directory, entry.get('Location')))
+            if (entry.get('Name') == filename_to_check and entry.get('Owner') == owner_to_check) or (entry.get('Name') == filename_to_check and owner_to_check == 'root'):
+                return {'file_path': full_path, **entry}
+    return None
+
+
+def edit_file_with_editor(file_path):
+    editor = input("Enter the text editor command (e.g., nano, vim, gedit): ")
+    try:
+        subprocess.run([editor, file_path], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while opening the text editor: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+
+def update_metadata_size(json_file_path, entry, new_size):
+    try:
+        with open(json_file_path, 'r') as json_file:
+            data = json.load(json_file)
+
+        for i, item in enumerate(data):
+            if item['Name'] == entry['Name'] and item['Owner'] == entry['Owner']:
+                data[i]['Size'] = new_size
+
+        with open(json_file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=2)
+    except Exception as e:
+        print(f"An error occurred while updating metadata: {e}")
+
+
+if __name__ == "__main__":
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+    try:
+        metadata_file_path = os.path.join(mydistro_directory, 'data', 'metadata.json')
+        with open(metadata_file_path, 'r') as metadata_file:
+            metadata_data = json.load(metadata_file)
+    except FileNotFoundError:
+        print('Error: metadata file not found')
+        sys.exit(1)
+
+    try:
+        owner_file_path = os.path.join(mydistro_directory,'data', 'check_user_file.txt')
+        with open(owner_file_path, 'r') as owner_file:
+            owner = owner_file.read().strip()
+    except FileNotFoundError:
+        print('Error: owner file not found')
+        sys.exit(1)
+
+    if len(sys.argv) < 2:
+        print("There is no argument!")
+        sys.exit(1)
+
+    i=sys.argv[1]
+    entry = check_file_entry(i,owner)
+    if entry is not None:
+            if is_regular_file(entry['file_path'], owner):
+                edit_file_with_editor(entry['file_path'])
+                new_size = os.path.getsize(entry['file_path'])
+                update_metadata_size(metadata_file_path, entry, new_size)
+            else:
+                print(f"Error: '{i}' is not a regular file")
+    else:
+            print(f"Error: file '{i}' not found or permission denied")

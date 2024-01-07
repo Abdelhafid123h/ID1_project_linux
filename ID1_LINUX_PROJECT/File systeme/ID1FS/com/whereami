@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+import os
+
+def current_directory():
+    chemin = os.getcwd()
+    print(f"Current directory : {chemin} ")
+
+if __name__ == "__main__":
+    current_directory()
+

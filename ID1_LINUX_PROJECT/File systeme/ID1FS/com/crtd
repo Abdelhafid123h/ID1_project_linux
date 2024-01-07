@@ -1,0 +1,92 @@
+#!/usr/bin/python3
+import argparse
+import json
+from datetime import datetime
+import os
+
+def create_directory_with_metadata(directory_name, metadata_file_path):
+    # Get the current date for creation timestamp
+    creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Read owner and permissions from the permissions file
+    owner_path = os.path.join(os.path.dirname(__file__), '..','data', 'check_user_file.txt')
+    droits_path = os.path.join(os.path.dirname(__file__), '..', 'permissions.txt')
+
+    try:
+        with open(droits_path, 'r') as droits_file:
+            droits = droits_file.read().strip()
+    except FileNotFoundError:
+        print(f"Error: droits file not found at {droits_path}")
+        return
+
+    try:
+        with open(owner_path, 'r') as owner_file:
+            owner = owner_file.read().strip()
+    except FileNotFoundError:
+        print(f"Error: owner file not found at {owner_path}")
+        return
+
+    # Get the full directory path
+    owner_directory = os.path.join(os.path.dirname(__file__), '..', 'home', owner)
+    directory_path = os.path.join(owner_directory, directory_name)
+
+    # Check if the owner's directory exists
+    if not os.path.exists(owner_directory):
+        print(f" '{owner}' not found.")
+        return
+
+    # Create the directory
+    try:
+        os.makedirs(directory_path)
+    except FileExistsError:
+        print(f"Error: Directory '{directory_name}' already exists.")
+        return
+
+    metadata_entry = {
+        'Name'         : directory_name,
+        'Type'         : 'directory',
+        'Owner'        : owner,
+        'Location'     : directory_path,
+        'Date Created' : creation_date,
+        'Permissions'  : droits,
+        'Status'       : 'Available'
+    }
+
+    # Append metadata to the metadata JSON file
+    try:
+        with open(metadata_file_path, 'r') as metadata_file:
+            metadata_data = json.load(metadata_file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        metadata_data = []
+
+    metadata_data.append(metadata_entry)
+
+    with open(metadata_file_path, 'w') as metadata_file:
+        json.dump(metadata_data, metadata_file, indent=2)
+
+    print(f"Directory '{directory_name}' created successfully with metadata.")
+    text_to_append = f'{directory_name} is created at {creation_date}\n'
+    with open(os.path.join(os.path.dirname(__file__), '..','data', 'journal.txt'), 'a') as file4:
+        file4.write(text_to_append)
+
+def main():
+    # Create an argument parser
+    parser = argparse.ArgumentParser(description="Create a directory with metadata")
+
+    # Define command-line arguments
+    parser.add_argument("directory_name", type=str, help="Name of the directory to create")
+
+    # Specify the path to the metadata JSON file
+    metadata_file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'metadata.json')
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Call the create_directory_with_metadata function with the provided directory name
+    try:
+        create_directory_with_metadata(args.directory_name, metadata_file_path)
+    except:
+        print('Permission denied or owner directory does not exist.')
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,22 @@
+[
+  {
+    "username": "root",
+    "hashed_password": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "created_at": "2023-12-19 19:47:42"
+  },
+  {
+    "username": "hafid",
+    "hashed_password": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "created_at": "2023-12-19 20:00:36"
+  },
+  {
+    "username": "moha",
+    "hashed_password": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "created_at": "2023-12-22 18:02:26"
+  },
+  {
+    "username": "khadija",
+    "hashed_password": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "created_at": "2023-12-22 18:16:26"
+  }
+]

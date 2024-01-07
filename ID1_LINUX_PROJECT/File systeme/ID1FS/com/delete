@@ -1,0 +1,74 @@
+#!/usr/bin/python3
+import argparse
+import json
+import os
+from datetime import datetime
+
+def check(filename, owner, metadata_data):
+    for entry in metadata_data:
+        if (entry.get('Name') == filename and entry.get('Owner') == owner) or (entry.get('Name') == filename and owner == 'root'):
+            return entry
+    return False
+
+def delete_file_with_metadata(target, owner_path, metadata_file_path, is_directory=False):
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    mydistro_directory = os.path.dirname(script_directory)
+
+    # Read owner from the owner file
+    with open(os.path.join(mydistro_directory, owner_path), 'r') as owner_file:
+        owner = owner_file.read().strip()
+
+    # Read metadata from the metadata JSON file
+    with open(os.path.join(mydistro_directory, metadata_file_path), 'r') as metadata_file:
+        metadata_data = json.load(metadata_file)
+
+    entry = check(target, owner, metadata_data)
+    if entry:
+        file_path = entry.get('Location')
+        if is_directory:
+            if os.path.exists(file_path):
+                os.rmdir(file_path)
+                metadata_data.remove(entry)
+
+                with open(os.path.join(mydistro_directory, metadata_file_path), 'w') as metadata_file:
+                    json.dump(metadata_data, metadata_file, indent=2)
+
+                print(f"Directory '{target}' deleted successfully.")
+                creation_date = entry.get('Date Created')
+                text_to_append = f'{target} directory is deleted at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}, created on {creation_date}\n'
+                with open(os.path.join(mydistro_directory, 'data', 'journal.txt'), 'a') as file4:
+                    file4.write(text_to_append)
+            else:
+                print(f"Error: Directory '{target}' does not exist.")
+        else:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                metadata_data.remove(entry)
+
+                with open(os.path.join(mydistro_directory, metadata_file_path), 'w') as metadata_file:
+                    json.dump(metadata_data, metadata_file, indent=2)
+
+                print(f"File '{target}' deleted successfully.")
+                creation_date = entry.get('Date Created')
+                text_to_append = f'{target} file is deleted at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}, created on {creation_date}\n'
+                with open(os.path.join(mydistro_directory, 'data', 'journal.txt'), 'a') as file4:
+                    file4.write(text_to_append)
+            else:
+                print(f"Error: File '{target}' does not exist or is not a file.")
+    else:
+        print("Error: Permission denied or not found ")
+
+def main():
+    parser = argparse.ArgumentParser(description="Delete a file or directory with metadata")
+    parser.add_argument("target", type=str, help="Name of the file or directory to delete")
+    parser.add_argument("-d", "--directory", action="store_true", help="Delete a directory (default is to delete a file)")
+    args = parser.parse_args()
+
+    metadata_file_path = 'data/metadata.json'
+    owner_path = 'data/check_user_file.txt'
+
+    delete_file_with_metadata(args.target, owner_path, metadata_file_path, is_directory=args.directory)
+
+if __name__ == "__main__":
+    main()
+

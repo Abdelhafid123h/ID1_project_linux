@@ -1,0 +1,579 @@
+#!/bin/bash
+#----------------------------------------------------------------------------#
+# Defining text colors
+red=`tput setaf 1`
+grn=`tput setaf 2`
+ylw=`tput setaf 3`
+blu=`tput setaf 4`
+pur=`tput setaf 5`
+rst=`tput sgr0`
+bold=`tput bold`
+#----------------------------------------------------------------------------#
+DIR="/ID1FS"
+bin="$DIR/recyclebin"
+cache="$DIR/recyclebin/.cache"
+log="$DIR/recyclebin/.log"
+rbinrc="$DIR/.rbinrc"
+# if $bin doesn't exist, create
+if [ ! -d "$bin" ]; then
+# echo "$bin exist."
+#else
+ echo "$bold$grn $bin $rst$bold Created.$rst"
+ mkdir -p $bin
+ touch $cache $rbinrc
+ cat >>$rbinrc<<EOF
+ AUTO_CLEAN=OFF
+ EXPIRY_DAYS=30
+EOF
+fi
+#------------------------------------------------------------------------------------------------------------#
+# Function to write the action in journal.txt
+#------------------------------------------------------------------------------------------------------------#
+function log_action() {
+    action="$1"
+    user=$(cat $DIR/data/check_user_file.txt)
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$action at $timestamp by $user" >> $DIR/data/journal.txt
+}
+
+
+#------------------------------------------------------------------------------------------------------------#
+# Function to move files to recyclebin
+#------------------------------------------------------------------------------------------------------------#
+#funnction to verify if the user want to delete a file or a dir is the owner or is the root
+function check_user_ownership_delete() {
+    file_to_delete="$1"
+    owner=$(jq -r --arg name "$file_to_delete" '.[] | select(.Name == $name) | .Owner' $DIR/data/metadata.json)
+    content=$(cat $DIR/data/check_user_file.txt)
+
+    if [[ "$owner" == "$content" || "$content" == "root" ]]; then
+        # The user current is the owner of the file
+         #the current user is the root
+        delete "$file_to_delete"
+    else
+        # the current user neither the owner nor the root
+        echo "Sorry, you are not allowed to delete $file_to_delete."
+    fi
+}
+
+# Function to change status in metadata.json
+change_status() {
+    file_name="$1"
+    new_status="$2"
+
+    # Copy metadata.json to temp.json and replace specified status for the specified file
+    jq --arg name "$file_name" --arg status "$new_status" '
+        map(if .Name == $name then .Status = $status else . end)
+    '/ID1FS/data/metadata.json > temp.json
+
+    # Remove the original metadata.json file
+    rm /ID1FS/data/metadata.json
+
+    # Rename temp.json to metadata.json
+    mv temp.json /ID1FS/data/metadata.json
+}
+
+function delete() {
+file=`echo "$1"|cut -d "/" -f1`
+tag=$RANDOM
+if [[ ( -f "$file" ) || ( -d "$file" ) ]]; then
+   if [[ ( -f "$bin/$file" ) || ( -d "$bin/$file" ) ]]; then
+   mv $bin/$file $bin/$file.$tag
+   sed -i "s/$file:/$file.$tag:/g" $cache
+   fi
+   UpdateCache $file
+   mv  $file $bin
+   log_action "$file is moved into recyclebin"
+   echo "$file is moved to deleted items"
+else
+   echo "$bold$red dltbin$rst$bold: --->$ylw $file$rst$bold not found.$rst"
+fi
+change_status "$1" "Available in recyclebin"
+}
+
+#-------------------------------------------------------------------------------------------------------------------------#
+# Function to delete the files perminantly.
+#-------------------------------------------------------------------------------------------------------------------------#
+#funnction to verify if the user want to delete a file or a dir is the owner or is the root
+function check_user_ownership_perminant() {
+    file_to_delete="$1"
+    owner=$(jq -r --arg name "$file_to_delete" '.[] | select(.Name == $name) | .Owner' $DIR/data/metadata.json)
+    content=$(cat $DIR/data/check_user_file.txt)
+
+    if [[ "$owner" == "$content" || "$content" == "root" ]]; then
+        # The user is the owner of the file
+         # where the current user is root
+        Remove_Perminant "$file_to_delete"
+    else
+        # the current user neither the owner nor the root
+        echo "Sorry, you are not allowed to permentally delete $file_to_delete."
+    fi
+}
+# Function to remove metadata of a file from metadata.json
+rmv_metadata() {
+    file_name="$1"
+
+    # Creating a temporary file to store the modified metadata
+    temp_file=$(mktemp)
+
+    # Copying all lines except the one containing the specified file name
+    jq --arg name "$file_name" 'map(select(.Name != $name))' $DIR/data/metadata.json > "$temp_file"
+
+    # Replace the metadata.json file with the modified content
+    mv "$temp_file" $DIR/data/metadata.json
+}
+function Remove_Perminant() {
+if [[ ( -f "$1" ) || ( -d "$1" ) ]]; then
+  current_dir=`pwd`
+#--->
+  if [[ "$current_dir" == "$bin" ]];then
+  rm -rf $1
+  sed -i "/$1:/d" $cache
+  else
+#    read -p "This action will perminantly remove the files. Press 'y' to continue [y/n] ? : " option
+#    if [[ ( "$option" == "y" ) || ( "$option" == "yes" ) ]];then
+       rm -rf $1
+#    fi
+  fi
+#<---
+   echo "$bold$red dltbin$rst$bold: --->$ylw $1$rst$bold has deleted perminantly.$rst"
+   log_action "$1 is removed permantly"
+else
+   echo "$bold$red dltbin$rst$bold: --->$ylw $1$rst$bold not found.$rst"
+fi
+rmv_metadata $1
+}
+
+#---------------------------------------------------------------------------------------------------------------------#
+# Function to empty the recyclebin
+#---------------------------------------------------------------------------------------------------------------------#
+
+function EmptyBin() {
+  check_user_file_empty  # Vérifier le fichier check_user_file.txt avant de vider la recyclebin
+  current_dir=`pwd`
+#--->
+ if [[ "$current_dir" == "$bin" ]];then
+    read -p "$bold$red Are you sure want to empty the Recyclebin [$rst$bold y/n $rst$red] ? :$rst " option
+    if [[ "$option" == "y" ]];then
+    rm -rf *
+    rm $cache
+    echo "$bold$red dltbin$rst$bold: --->$ylw Recyclebin is empty.$rst"
+    else
+    echo "$bold$red dltbin$rst$bold: --->$ylw Recyclebin is NOT empty.$rst"
+    fi
+    log_action "recyclebin is emptied"
+ else
+    echo "$bold$red dltbin$rst$bold: --->$ylw The current direcory is NOT a Recyclebin.$rst"
+ fi
+}
+
+# Fonction pour vérifier le contenu du fichier check_user_file.txt
+function check_user_file_empty() {
+    user_file="$DIR/data/check_user_file.txt"
+    expected_user="root"
+
+    if [[ -f "$user_file" ]]; then
+        content=$(cat "$user_file")
+        if [[ "$content" != "$expected_user" ]]; then
+            echo "Sorry, only the administrator can empty the recyclebin."
+            exit 1
+        fi
+    else
+        echo "Error: File $user_file does not exist."
+        exit 1
+    fi
+}
+
+#-----------------------------------------------------------------------------------------------------------------------#
+# Function to restore the deleted files from recyclebin.
+#-----------------------------------------------------------------------------------------------------------------------#
+#function verify if the user cerrent is the ownership or the root
+function check_user_ownership_restore() {
+    file_to_restore="$1"
+    owner=$(jq -r --arg name "$file_to_restore" '.[] | select(.Name == $name) | .Owner' $DIR/data/metadata.json)
+    content=$(cat $DIR/data/check_user_file.txt)
+
+    if [[ "$owner" == "$content" || "$content" == "root" ]]; then
+        # The user current is the owner of the file
+         #the current user is the root
+        Restore "$file_to_restore"
+    else
+        # the current user neither the owner nor the root
+        echo "Sorry, you are not allowed to restore $file_to_restore."
+    fi
+}
+#function to restore the given file
+function Restore() {
+   current_dir=`pwd`
+   file=`echo "$1"|cut -d "/" -f1`
+   original_path=`grep " $file:" $cache|cut -d ":" -f 2`
+#--->
+if [[ "$current_dir" == "$bin" ]];then
+
+   if [[ ( -f "$file" ) || ( -d "$file" ) ]]; then
+      mv $bin/$file $original_path
+      if [ "$?" == "0" ];then
+      sed -i "/$file:/d" $cache
+      fi
+       log_action "$file is restored from recylebin"
+#      echo "rbin: [restored] $file ------>  $original_path"
+      echo "$bold$red dltbin$rst$bold:[$grn Restored $rst]$bold $file          ---> $original_path $rst"
+      change_status "$1" "Available"
+   else
+   echo "$bold$red dltbin$rst$bold: --->$ylw $file$rst$bold not found.$rst"
+   fi
+else
+    echo "$bold$red dltbin$rst$bold: --->$ylw The current direcory is NOT a Recyclebin.$rst"
+fi
+}
+
+#--------------------------------------------------------------------------------------------------#
+# Function to update Cache for given file. It stores the information about file
+#--------------------------------------------------------------------------------------------------#
+function UpdateCache() {
+file=$1
+path=`pwd`
+date=`date +%s`
+cat >>$cache<<EOF
+ $1: $path:$date
+log_action "$file is updated in the Cache"
+EOF
+}
+#----------------------------------------------------------------------------#
+# Function to get details from $rbinrc
+function Read_rbinrc() {
+if [[ ( -f "$rbinrc" ) ]]; then
+switch=`grep "AUTO_CLEAN" $rbinrc|cut -d "=" -f2`
+expiry=`grep "EXPIRY_DAYS" $rbinrc|cut -d "=" -f2`
+else
+ touch $rbinrc
+ cat >>$rbinrc<<EOF
+ AUTO_CLEAN=OFF
+ EXPIRY_DAYS=30
+EOF
+switch="OFF"
+fi
+#echo "SWITCH: $switch"
+#echo "EXPIRY: $expiry"
+}
+#---------------------------------------------------------------------------------------------------------------------#
+#function to set Autoclean option
+#---------------------------------------------------------------------------------------------------------------------#
+function set_Autoclean() {
+check_user_file_autoclean    # Verify the check_user_file.txt file before modify the autoclean
+Read_rbinrc
+ if [[ "$switch" == "OFF" ]];then
+#---> when off
+echo "$bold Autoclean status is $ylw OFF.$rst"
+echo ""
+read -p "$bold$ylw Activate Autoclean [$rst$bold ON/OFF$ylw] :$rst" option
+   if [[ "$option" == "ON" ]];then
+     switch="ON"
+     Set_Crontab
+   else
+     switch="OFF"
+  echo "$bold$red dltbin$rst$bold: --->$grn Autoclean feature is remains deactivated.$rst"
+   exit
+   fi
+read -p "$bold$ylw Set Expiry Days for Auto Deletion [$rst$bold$red in Days$rst$bold] :$rst" ndays
+   if [[ "$ndays" != "" ]];then
+
+cat >$rbinrc<<EOF
+ AUTO_CLEAN=$switch
+ EXPIRY_DAYS=$ndays
+EOF
+else
+     ndays=30
+cat >$rbinrc<<EOF
+ AUTO_CLEAN=$switch
+ EXPIRY_DAYS=$ndays
+EOF
+   fi
+  echo "$bold$red dltbin$rst$bold: --->$grn Autoclean feature is activated.$rst"
+#<---when off
+else
+#---> when on
+echo "$bold Autoclean status is $ylw ON.$rst"
+echo ""
+read -p "$bold$ylw Deactivate Autoclean [$rst$bold ON/OFF$ylw] :$rst" option
+   if [[ "$option" == "OFF" ]];then
+     switch="OFF"
+     Remove_Crontab
+   else
+     switch="ON"
+  echo "$bold$red dltbin$rst$bold: --->$grn Autoclean feature is remains activated.$rst"
+  exit
+   fi
+
+cat >$rbinrc<<EOF
+ AUTO_CLEAN=$switch
+ EXPIRY_DAYS=$ndays
+EOF
+ echo "$bold$red dltbin$rst$bold: --->$grn Autoclean feature is deactivated.$rst"
+#<--- When on
+fi
+}
+#----------------------------------------------------------------------------#
+# Fonction pour vérifier le contenu du fichier check_user_file pour l'autoclean
+function check_user_file_autoclean() {
+    user_file="$DIR/data/check_user_file.txt"
+    expected_user="root"
+
+    if [[ -f "$user_file" ]]; then
+        content=$(cat "$user_file")
+        if [[ "$content" != "$expected_user" ]]; then
+            echo "Access denied: Only administrators have permission to modify autoclean."
+            exit 1
+        fi
+    else
+        echo "Error: File $user_file does not exist."
+        exit 1
+    fi
+}
+#----------------------------------------------------------------------------#
+#function to set Autoclean option
+function set_Autoclean_2() {
+echo " Setting Autoclean Option:"
+echo ""
+     switch=$1
+#if ON,set crontab
+     ndays=$2
+#
+ echo " AUTO_CLEAN=$switch"
+ echo " EXPIRY_DAYS=$ndays"
+#
+cat >$rbinrc<<EOF
+ AUTO_CLEAN=$switch
+ EXPIRY_DAYS=$ndays
+EOF
+}
+#----------------------------------------------------------------------------#
+#function to set crontab
+function Set_Crontab() {
+#write out current crontab
+crontab -l > mycron
+#echo new cron into cron file
+path=`which rbin`
+echo "0 0 * * * bash $path --autoclean" >> mycron
+#install new cron file
+crontab mycron
+rm mycron
+echo "dltbin:---> Activated Autoclean at $now ." >>$log
+}
+#----------------------------------------------------------------------------#
+# Function to remove crontab
+function Remove_Crontab() {
+crontab -l > mycron
+#echo new cron into cron file
+a=`grep "--autoclean" mycron`
+if [ "$?" == "0" ];then
+sed -i "/--autoclean/d" mycron
+#install new cron file
+crontab mycron
+rm mycron
+echo "dltbin:---> Deactivated Autoclean at $now ." >>$log
+fi
+}
+#-------------------------------------------------------------------------------------------------#
+#function to Inspect files in $bin
+#-------------------------------------------------------------------------------------------------#
+function Inspect() {
+ Read_rbinrc
+ if [[ "$switch" == "ON" ]];then
+    list=`ls $bin`
+    #echo $list
+    for file in $list;do
+       del_date=`grep " $file:" $cache|cut -d ":" -f 3`
+       cur_date=`date +%s`
+       days=$(((cur_date - del_date)/86400))
+       if [ $days -ge $expiry ];then
+          rm -rf $bin/$file
+          if [ "$?" == "0" ];then
+            sed -i "/$file:/d" $cache
+          fi
+       fi
+    done
+ fi
+now=`date`
+echo "dltbin:---> $now inspcted." >>$log
+}
+#----------------------------------------------------------------------------#
+#function to Print the contents in $bin with Age
+function listContents() {
+ Read_rbinrc
+
+   current_dir=`pwd`
+if [[ "$current_dir" == "$bin" ]];then
+  list=`ls $bin`
+   for file in $list;do
+   del_date=`grep " $file:" $cache|cut -d ":" -f 3`
+   cur_date=`date +%s`
+#
+#--->
+   days=$(((cur_date - del_date)/86400))
+   hrs=$(((cur_date - del_date)/3600))
+   mnts=$(((cur_date - del_date)/60))
+   sec=$((cur_date - del_date))
+#<---
+totallefthrs=$((expiry*24 - hrs))
+leftdays=$((totallefthrs/24))
+lefthrs=$((totallefthrs%24))
+#--->
+if [[ "$switch" == "ON" ]];then
+    echo "$bold[$red Delete in$rst$grn $leftdays $rst$red Days$rst$grn $lefthrs $rst$red Hrs $rst$bold]$rst $file"
+else
+
+   if [[ "$days" < "1" ]];then
+      if [[ "$hrs" < "1" ]];then
+         if [[ "$switch" == "ON" ]];then
+           echo "$bold[$red $mnts Min $rst$bold] $file $rst"
+         else
+           echo "$bold[$red $mnts Min $rst$bold] $file $rst"
+         fi
+      else
+         echo "$bold[$red $hrs Hrs $rst$bold] $file $rst"
+      fi
+   else
+         echo "$bold[$red $days Days $rst$bold] $file $rst"
+   fi
+fi
+   done
+#<---
+ else
+    echo "$bold$red rbin$rst$bold: --->$ylw The current direcory is NOT a Recyclebin.$rst"
+ fi
+}
+#----------------------------------------------------------------------------#
+function print_help() {
+cat <<EOF
+-----------------------------------------------------------------------------
+    <========================== dltbin =============================>
+                 A command-line recyclebin for ID1FS file system
+-----------------------------------------------------------------------------
+ Description:
+
+    dltbin is a software which acts as a RECYCLEBIN to delete and restore the
+    files in ID1FS. Restores the selected file/directory to its original location.
+    And deletes the files perminantly whose deletion date is more than 30 days.
+
+ Features:
+
+    dltbin                 ---> main excutable and deletes given files
+    dltbin -d/--del        ---> Deletes the files or Directories
+    dltbin -r/--restore    ---> Restores the given files.
+    dltbin -e/--emptybin   ---> Will empty the recyclebin
+    dltbin --SetAutoclean  ---> Options: on , off, Period_of_days to clean the bin
+    dltbin -h/--help       ---> Prints the information about dltbin.
+    dltbin -f/--force      ---> Deletes the given file perminantly
+    dltbin -l/--list       ---> Lists the contents in Recyclebin along with
+                              the age from the day of deletion.
+    dltbin -v/--version    ---> Prints the current version of the package.
+
+
+ Directories:
+
+    recyclebin          ---> Place to store the deleted files
+    recyclebin/.cache   ---> Contains the information about deleted files
+				(date of deletion & original location)
+
+ Examples:
+
+    dltbin *              ---> Deletes all files from current directory.
+    dltbin -r *           ---> Restores all files from recyclebin.
+    dltbin -f *           ---> Removes all files perminantly from current directory.
+    dltbin file1          ---> Deletes the file1
+    dltbin -r file1       ---> Restore the file1
+    dltbin -e             ---> Makes recyclebin empty.
+    dltbin -s             ---> Allows to ON or OFF Auto clean feature.
+    dltbin tes_*         ---> Deletes all files starts with tes_
+    dltbin file1 file2 dir1 ---> Deletes file1 file2 dir1
+    dltbin file_[1-3]*    ---> Deletes starts with file_1* file_2* file_3*
+
+
+-----------------------------------------------------------------------------
+EOF
+}
+
+#----------------------------------------------------------------------------#
+function perform_task() {
+if [[ "$1" != "" ]];then
+#---> $2 open
+  if [[ "$2" != "" ]];then
+    
+     case "$1" in
+        -h|--help) print_help;;
+        -d|--del|--delete)
+         check_user_ownership_delete $2 ;;
+        -e|--empty|--emptybin)
+         EmptyBin ;;
+        -r|--restore|--res)
+         check_user_ownership_restore $2;;
+        -f|--force)
+         check_user_ownership_perminant $2;;
+        *)
+         check_user_ownership_delete $2
+         ;;
+     esac
+   else
+     case "$1" in
+        -l|--list)listContents;;
+        -v|--version)echo "$bold$grn Version: 1.0 $rst";;
+        -h|--help) print_help;;
+        -e|--empty|--emptybin)EmptyBin ;;
+        --SetAutoclean|--SAC|-s)
+          set_Autoclean;;
+        -d|--del|--delete)
+          if [[ "$narg" -lt "2" ]];then
+             echo "$bold$red dltbin$rst$bold: --->$ylw Expected Argument with -d tag.$rst"
+          fi
+          ;;
+        -r|--restore|--res)
+          if [[ $narg -lt 2 ]];then
+             echo "$bold$red dltbin$rst$bold: --->$ylw Expected Argument with -r tag.$rst"
+          fi
+          ;;
+        -f|--force)
+          if [[ "$narg" -lt "2" ]];then
+             echo "$bold$red dltbin$rst$bold: --->$ylw Expected Argument with -f tag.$rst"
+          fi
+          ;;
+        --autoclean|--inspect|-ac)
+          Inspect;;
+        *) check_user_ownership_delete $1 ;;
+     esac
+   fi
+#<--- $2 close
+else
+     echo "$bold$red dltbin$rst$bold: Argument expected.!$rst"
+     echo "$bold See $grn  dltbin --help $rst"
+fi
+}
+#----------------------------------------------------------------------------#
+#    <========================== MAIN CODE =============================>
+#----------------------------------------------------------------------------#
+narg=$#
+arg=$*
+
+#echo "$narg"
+#echo "$arg"
+
+if [[ "$1" != "" ]];then
+#---> Arg
+  if [[ "$narg" != "1" ]];then
+     for i in $arg;do
+        if [[ "$i" != "$1" ]];then
+#           echo "$i"
+           perform_task $1 $i
+        else
+           perform_task $1 
+        fi
+     done
+  else
+     perform_task $1 
+  fi
+#<--- Arg
+else
+     echo "$bold$red dltbin$rst$bold: Argument expected.!$rst"
+     echo "$bold See $grn  dltbin --help $rst"
+fi
+
